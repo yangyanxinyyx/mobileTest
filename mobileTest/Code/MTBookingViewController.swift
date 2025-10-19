@@ -44,6 +44,14 @@ class MTBookingViewController: UIViewController {
         refreshBtn.setTitleColor(.blue, for: .normal)
         refreshBtn.addTarget(self, action: #selector(refreshData), for: .touchUpInside)
         view.addSubview(refreshBtn)
+
+        //清除内存缓存按钮
+        let clearCacheBtn = UIButton()
+        clearCacheBtn.frame = CGRectMake(200, 50, 100, 44)
+        clearCacheBtn.setTitle("clearCache", for: .normal)
+        clearCacheBtn.setTitleColor(.blue, for: .normal)
+        clearCacheBtn.addTarget(self, action: #selector(clearMemoryCache), for: .touchUpInside)
+        view.addSubview(clearCacheBtn)
     }
 
     func initData()  {
@@ -66,6 +74,12 @@ class MTBookingViewController: UIViewController {
             self?.tableView.reloadData()
             print("刷新数据列表")
         }
+    }
+
+    ///点击清除内存缓存 用于使用磁盘缓存
+    @objc func clearMemoryCache() {
+        print("点击清除内存缓存数据")
+        modelManager.clearCache()
     }
 }
 

@@ -16,16 +16,22 @@ class MTDataManager : NSObject{
         let currentDateString = self.changeTimestampToTime(currentTime)
         print("当前时间: \(currentDateString)")
 
-        if let cachedBookings = cache.getValidBookings()
+        if let viewModel = viewModel
+            ,let expiryTime = Int(viewModel.expiryTime)
+            ,expiryTime > currentTime {
+            print("内存缓存在有效期内 使用内存缓存")
+            completion?(viewModel)
+
+        } else if let cachedBookings = cache.getValidBookings()
             ,let expiryTime = Int(cachedBookings.expiryTime)
             ,expiryTime > currentTime {
-            print("缓存在有效期内 使用缓存")
+            print("磁盘缓存在有效期内 使用磁盘缓存")
 
             viewModel = cachedBookings
             completion?(cachedBookings)
 
         } else {
-            print("缓存不在有效期内 请求新的数据")
+            print("没有在有效期内的缓存 请求新的数据")
             service.fetchBookings { [weak self] result in
                 switch result {
                 case .success(let response):
@@ -55,26 +61,45 @@ class MTDataManager : NSObject{
         formatter.timeZone = TimeZone.current // 使用当前时区
         return formatter.string(from: date)
     }
+
+    ///点击清除内存缓存 用于使用磁盘缓存
+    func clearCache()  {
+        viewModel = nil
+    }
 }
 
 
 class MTBookingCache {
     static let shared = MTBookingCache()
-    private let userDefault = UserDefaults.standard
-    private let cacheKey = "kBookingCache"
+    private let fileManager = FileManager.default //使用沙盒目录cache文件夹
+
+    private var cacheFilePath: URL? {
+        guard let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        return cacheDir.appendingPathComponent("booking_cache.json")
+    }
 
     func save(bookings: MTBookingModel) {
+        guard let filePath = cacheFilePath else {
+            print("缓存路径无效")
+            return
+        }
         do {
             let data = try JSONEncoder().encode(bookings)
-            userDefault.set(data, forKey: cacheKey)
+            try data.write(to: filePath)
         } catch {
             print("缓存保存失败: \(error)")
         }
     }
 
     func getValidBookings() -> MTBookingModel? {
-        guard let data = userDefault.data(forKey: cacheKey) else { return nil }
+        guard let filePath = cacheFilePath,
+              fileManager.fileExists(atPath: filePath.path) else {
+            return nil
+        }
         do {
+            let data = try Data(contentsOf: filePath)
             return try JSONDecoder().decode(MTBookingModel.self, from: data)
         } catch {
             print("缓存解析失败: \(error)")
@@ -83,8 +108,18 @@ class MTBookingCache {
     }
 
     func clear() {
-        userDefault.removeObject(forKey: cacheKey)
+        guard let filePath = cacheFilePath,
+              fileManager.fileExists(atPath: filePath.path) else {
+            return
+        }
+        do {
+            try fileManager.removeItem(at: filePath)
+            print("清除磁盘缓存")
+        } catch {
+            print("缓存清除失败: \(error)")
+        }
     }
+
 }
 
 class MTBookingService {
