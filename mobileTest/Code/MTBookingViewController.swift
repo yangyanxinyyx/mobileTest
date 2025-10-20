@@ -26,32 +26,32 @@ class MTBookingViewController: UIViewController {
     func initViews() {
         view.backgroundColor = .white
 
-        let backBtn = UIButton()
-        backBtn.frame = CGRectMake(10, 50, 44, 44)
-        backBtn.setTitle("back", for: .normal)
-        backBtn.setTitleColor(.blue, for: .normal)
-        backBtn.addTarget(self, action: #selector(backToHome), for: .touchUpInside)
-        view.addSubview(backBtn)
+        let backButton = UIButton()
+        backButton.frame = CGRect(x: 10, y: 50, width: 44, height: 44)
+        backButton.setTitle("back", for: .normal)
+        backButton.setTitleColor(.blue, for: .normal)
+        backButton.addTarget(self, action: #selector(backToHome), for: .touchUpInside)
+        view.addSubview(backButton)
 
-        tableView.frame = CGRectMake(0, 100, 300, 200)
+        tableView.frame = CGRect(x: 0, y: 100, width: 300, height: 200)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.dataSource = self
         view.addSubview(tableView)
 
-        let refreshBtn = UIButton()
-        refreshBtn.frame = CGRectMake(100, 50, 64, 44)
-        refreshBtn.setTitle("refresh", for: .normal)
-        refreshBtn.setTitleColor(.blue, for: .normal)
-        refreshBtn.addTarget(self, action: #selector(refreshData), for: .touchUpInside)
-        view.addSubview(refreshBtn)
+        let refreshButton = UIButton()
+        refreshButton.frame = CGRect(x: 100, y: 50, width: 64, height: 44)
+        refreshButton.setTitle("refresh", for: .normal)
+        refreshButton.setTitleColor(.blue, for: .normal)
+        refreshButton.addTarget(self, action: #selector(refreshData), for: .touchUpInside)
+        view.addSubview(refreshButton)
 
         //清除内存缓存按钮
-        let clearCacheBtn = UIButton()
-        clearCacheBtn.frame = CGRectMake(200, 50, 100, 44)
-        clearCacheBtn.setTitle("clearCache", for: .normal)
-        clearCacheBtn.setTitleColor(.blue, for: .normal)
-        clearCacheBtn.addTarget(self, action: #selector(clearMemoryCache), for: .touchUpInside)
-        view.addSubview(clearCacheBtn)
+        let clearCacheButton = UIButton()
+        clearCacheButton.frame = CGRect(x: 200, y: 50, width: 100, height: 44)
+        clearCacheButton.setTitle("clearCache", for: .normal)
+        clearCacheButton.setTitleColor(.blue, for: .normal)
+        clearCacheButton.addTarget(self, action: #selector(clearMemoryCache), for: .touchUpInside)
+        view.addSubview(clearCacheButton)
     }
 
     func initData()  {

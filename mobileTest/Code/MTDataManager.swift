@@ -7,7 +7,7 @@
 
 import Foundation
 class MTDataManager : NSObject{
-    private var viewModel:MTBookingModel? = nil
+    private var viewModel: MTBookingModel? = nil
     private let service = MTBookingService()
     private let cache = MTBookingCache.shared
 
@@ -16,21 +16,23 @@ class MTDataManager : NSObject{
         let currentDateString = self.changeTimestampToTime(currentTime)
         print("当前时间: \(currentDateString)")
 
-        if let viewModel = viewModel
-            ,let expiryTime = Int(viewModel.expiryTime)
-            ,expiryTime > currentTime {
+        if let viewModel = viewModel,
+           let expiryTime = Int(viewModel.expiryTime),
+           expiryTime > currentTime {
+
             print("内存缓存在有效期内 使用内存缓存")
             completion?(viewModel)
 
-        } else if let cachedBookings = cache.getValidBookings()
-            ,let expiryTime = Int(cachedBookings.expiryTime)
-            ,expiryTime > currentTime {
-            print("磁盘缓存在有效期内 使用磁盘缓存")
+        } else if let cachedBookings = cache.getValidBookings(),
+                  let expiryTime = Int(cachedBookings.expiryTime),
+                  expiryTime > currentTime {
 
+            print("磁盘缓存在有效期内 使用磁盘缓存")
             viewModel = cachedBookings
             completion?(cachedBookings)
 
         } else {
+
             print("没有在有效期内的缓存 请求新的数据")
             service.fetchBookings { [weak self] result in
                 switch result {
@@ -45,7 +47,6 @@ class MTDataManager : NSObject{
                     let dateString = self.changeTimestampToTime(newExpiryTime)
                     print("获取新数据成功 记录新有效期: \(dateString)")
                     completion?(response)
-
                 case .failure(let error):
                     print("请求数据失败: \(error.localizedDescription)")
                 }
@@ -57,8 +58,10 @@ class MTDataManager : NSObject{
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.locale = Locale.current // 使用当前地区（避免时区问题）
-        formatter.timeZone = TimeZone.current // 使用当前时区
+        // 使用当前地区（避免时区问题）
+        formatter.locale = Locale.current
+        // 使用当前时区
+        formatter.timeZone = TimeZone.current
         return formatter.string(from: date)
     }
 
@@ -71,7 +74,8 @@ class MTDataManager : NSObject{
 
 class MTBookingCache {
     static let shared = MTBookingCache()
-    private let fileManager = FileManager.default //使用沙盒目录cache文件夹
+    //使用沙盒目录cache文件夹
+    private let fileManager = FileManager.default
 
     private var cacheFilePath: URL? {
         guard let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
@@ -119,7 +123,6 @@ class MTBookingCache {
             print("缓存清除失败: \(error)")
         }
     }
-
 }
 
 class MTBookingService {
@@ -138,8 +141,6 @@ class MTBookingService {
             let error = NSError(domain: "BookingService", code: -2, userInfo: [NSLocalizedDescriptionKey: "JSON文件解析失败"])
             completion(.failure(error))
         }
-
     }
-
 }
 

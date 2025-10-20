@@ -11,25 +11,23 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         initViews()
     }
 
     func initViews() {
         view.backgroundColor = .white
-
-        let btn = UIButton()
-        btn.frame = CGRectMake(300, 50, 44, 44)
-        btn.setTitle("open", for: .normal)
-        btn.setTitleColor(.blue, for: .normal)
-        btn.addTarget(self, action: #selector(pressToOpenBookingVC), for: .touchUpInside)
-        view.addSubview(btn)
+        let openButton = UIButton()
+        openButton.frame = CGRect(x: 300, y: 50, width: 44, height: 44)
+        openButton.setTitle("open", for: .normal)
+        openButton.setTitleColor(.blue, for: .normal)
+        openButton.addTarget(self, action: #selector(openBookingVC), for: .touchUpInside)
+        view.addSubview(openButton)
     }
 
-    @objc func pressToOpenBookingVC() {
+    @objc func openBookingVC() {
         print("即将进入测试数据页面")
-        let vc = MTBookingViewController()
-        self.present(vc, animated: true, completion: nil)
+        let bookingVC = MTBookingViewController()
+        self.present(bookingVC, animated: true, completion: nil)
     }
 }
 
